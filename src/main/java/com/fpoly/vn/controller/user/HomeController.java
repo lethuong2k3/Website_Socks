@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.Errors;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,9 +36,8 @@ public class HomeController {
     @GetMapping
     private String view(Model model, @ModelAttribute("login") LoginModel login,
                         @ModelAttribute("account") AccountModel account) {
-        model.addAttribute("activePopup", false);
         model.addAttribute("productFeatured", productService.findByNoiBat(true));
-        return "commons/index";
+        return "/commons/index";
     }
 
     @RequestMapping("/logout")
@@ -55,29 +53,27 @@ public class HomeController {
     }
 
     @PostMapping("/login")
-    public String isLogin(@Validated @ModelAttribute("login") LoginModel login, Errors errors,
-                          @ModelAttribute("account") AccountModel account, Model model){
-        if (errors.hasErrors()) {
-            model.addAttribute("activePopup", true);
-            return "commons/index";
+    public String isLogin(@Validated @ModelAttribute("login") LoginModel login,
+                          @Validated @ModelAttribute("account") AccountModel account, BindingResult result,
+                          Model model){
+        if (result.hasErrors()) {
+            return "redirect:/";
         } else {
             Account userLogin = repository.findByEmailEquals(login.getEmail());
             if (userLogin != null && login.getMatKhau().equals(userLogin.getMatKhau())) {
                 session.setAttribute("userLogin", userLogin);
                 return "redirect:/";
             } else {
-                model.addAttribute("checkLogin", true);
-                model.addAttribute("activePopup", true);
-                return "commons/index";
+                return "redirect:/";
             }
         }
     }
 
     @PostMapping("/register")
     public String isRegister(@Validated @ModelAttribute("account") AccountModel accountModel,
-                             @ModelAttribute("login") LoginModel login,
-                             Errors errors, Model model) {
-        if (errors.hasErrors()) {
+                             @Validated @ModelAttribute("login") LoginModel login,
+                             BindingResult result, Model model) {
+        if (result.hasErrors()) {
             return "redirect:/";
         } else {
             Account acc = new Account();
@@ -94,8 +90,7 @@ public class HomeController {
 
     @RequestMapping("/products/{id}")
     private String productDetail(Model model, @PathVariable(name = "id") UUID id) {
-        model.addAttribute("product", productService.getByID(id));
-        return "commons/product-details";
+        return "/commons/product-detail";
     }
 
 

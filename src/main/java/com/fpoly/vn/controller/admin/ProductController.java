@@ -131,7 +131,7 @@ public class ProductController {
     }
 
     @RequestMapping("/update/{id}")
-        private String updateProduct(@PathVariable(name = "id") UUID id, @ModelAttribute("product") Product product,
+    private String updateProduct(@PathVariable(name = "id") UUID id, @ModelAttribute("product") Product product,
                                  @RequestParam("attach") MultipartFile attach) {
         Path path = Paths.get("");
         path = path.resolve("src").resolve("main").resolve("resources").resolve("static").resolve("images");
